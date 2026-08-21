@@ -243,11 +243,11 @@
       <div class="reasons" id="sparks"></div>
       <div class="reveal-box" id="revealBox"></div>
 
-      <div class="dedication" id="dedication">
+   <div class="dedication" id="dedication">
         <div class="dedication-line">y por todo lo demás que no cabe en seis chispas...</div>
         <img class="dedication-photo" src="amormio.jpg" alt="nosotros">
         <div class="dedication-text">te amo, Angy Mi Niña Hermosa.</div>
-        <audio id="song" src="mydear.mp3" preload="none"></audio>
+        <audio id="song" src="mydear.mp3" preload="auto"></audio>
       </div>
     </div>
   </div>
@@ -270,6 +270,8 @@
   wrap.addEventListener('click', () => {
     if(wrap.classList.contains('open')) return;
     wrap.classList.add('open');
+    const song = document.getElementById('song');
+    song.play().catch(() => { /* el navegador bloqueó el autoplay */ });
     setTimeout(() => {
       wrap.style.display = 'none';
       document.querySelector('.hint').style.display = 'none';
@@ -278,7 +280,7 @@
   });
 
   // reasons / sparks
-  const reasons = [
+ const reasons = [
     "por cómo te ríes de tus propios chistes antes de terminarlos",
     "porque me haces querer ser mejor sin decírmelo directamente",
     "por aguantarme y quererme tanto",
@@ -311,7 +313,6 @@
           setTimeout(() => {
             dedication.style.display = 'block';
             dedication.scrollIntoView({ behavior:'smooth', block:'center' });
-            song.play().catch(() => { /* el navegador bloqueó el autoplay */ });
           }, 500);
         }
       }
