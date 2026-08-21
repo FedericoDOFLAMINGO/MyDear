@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Angy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --plum: #2a1e35;
+    --plum-deep: #1a1224;
+    --rose: #e7b7bd;
+    --gold: #cf9f5f;
+    --gold-soft: #e3c48f;
+    --paper: #f6efe2;
+    --paper-shadow: #e7dcc4;
+    --ink: #3c2e2a;
+  }
+  *{ box-sizing: border-box; }
+  html,body{
+    margin:0; padding:0; min-height:100vh;
+    background:
+      radial-gradient(ellipse at 20% 10%, #3a2a4a 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 85%, #241a30 0%, transparent 50%),
+      linear-gradient(160deg, var(--plum) 0%, var(--plum-deep) 100%);
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--ink);
+    overflow-x:hidden;
+    position: relative;
+  }
+  .stars{
+    position: fixed; inset:0; pointer-events:none; z-index:0;
+  }
+  .stars span{
+    position:absolute; width:2px; height:2px; background:var(--gold-soft);
+    border-radius:50%; opacity:.5; animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle{ 0%,100%{opacity:.15;} 50%{opacity:.85;} }
+
+  .stage{
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    position:relative; z-index:1; padding: 40px 20px;
+  }
+
+  /* ENVELOPE */
+  #envelope-wrap{
+    perspective: 1400px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .envelope{
+    width: min(360px, 84vw);
+    height: 240px;
+    position:relative;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,.5));
+  }
+  .env-body{
+    position:absolute; inset:0;
+    background: linear-gradient(180deg, #fbf5e7, #f0e4c8);
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+  }
+  .env-shadow-fold{
+    position:absolute; inset:0;
+    background:
+      linear-gradient(135deg, transparent 49.3%, rgba(0,0,0,.08) 50%, transparent 50.7%),
+      linear-gradient(-135deg, transparent 49.3%, rgba(0,0,0,.08) 50%, transparent 50.7%);
+    border-radius:6px;
+  }
+  .env-flap{
+    position:absolute; top:0; left:0; width:100%; height:130px;
+    background: linear-gradient(160deg, #ecdcb8, #dcc596);
+    clip-path: polygon(0 0, 100% 0, 50% 78%);
+    transform-origin: top center;
+    transition: transform 1s cubic-bezier(.6,.1,.2,1);
+    transform: rotateX(0deg);
+    z-index:5;
+    border-radius: 6px 6px 0 0;
+  }
+  #envelope-wrap.open .env-flap{ transform: rotateX(180deg); }
+
+  .seal{
+    position:absolute; top: 90px; left:50%; transform:translate(-50%,0);
+    width:52px; height:52px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #c0546a, #8f2f42 70%);
+    box-shadow: 0 3px 10px rgba(0,0,0,.4), inset 0 0 0 2px rgba(255,255,255,.08);
+    z-index:6;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Caveat', cursive; font-size: 22px; color:#f4d9c9;
+    transition: opacity .4s ease, transform .4s ease;
+  }
+  #envelope-wrap.open .seal{ opacity:0; transform:translate(-50%,0) scale(.4); }
+
+  .letter-peek{
+    position:absolute; left:6%; right:6%; bottom:10px;
+    height:85%; background: var(--paper);
+    border-radius: 4px 4px 0 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,.15);
+    z-index:2;
+    transition: transform 1s cubic-bezier(.6,.1,.2,1) .15s;
+    transform: translateY(88%);
+  }
+  #envelope-wrap.open .letter-peek{ transform: translateY(6%); }
+
+  .hint{
+    text-align:center; margin-top: 22px; color: var(--gold-soft);
+    font-family:'Caveat', cursive; font-size: 20px; letter-spacing:.5px;
+    animation: floaty 2.4s ease-in-out infinite;
+  }
+  @keyframes floaty{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+  #envelope-wrap.open ~ .hint{ display:none; }
+
+  /* LETTER */
+  #letter-full{
+    display:none;
+    width: min(620px, 92vw);
+    background: var(--paper);
+    border-radius: 4px;
+    box-shadow: 0 30px 70px rgba(0,0,0,.5), 0 0 0 1px rgba(0,0,0,.04);
+    padding: 48px 40px 40px;
+    position:relative;
+    animation: rise 1s ease .2s both;
+  }
+  @keyframes rise{ from{opacity:0; transform:translateY(30px);} to{opacity:1; transform:translateY(0);} }
+  #letter-full::before{
+    content:"";
+    position:absolute; inset:14px;
+    border: 1px solid rgba(60,46,42,.15);
+    pointer-events:none;
+  }
+  .to-line{
+    font-family:'Caveat', cursive; font-size: 30px; color:#7a3b46;
+    margin: 0 0 6px 6px;
+  }
+  .body-text p{
+    font-size: 21px; line-height:1.75; margin: 0 0 18px; text-align:left;
+  }
+  .body-text{ position:relative; z-index:1; }
+  .drop{
+    float:left; font-family:'Caveat', cursive; font-size: 64px;
+    line-height:.75; padding-right:8px; padding-top:6px; color:#7a3b46;
+  }
+
+  .signature{
+    margin-top: 28px; text-align:right; font-family:'Caveat', cursive;
+    font-size: 32px; color:#7a3b46;
+  }
+  .signature small{
+    display:block; font-family:'Cormorant Garamond',serif; font-size:14px;
+    color: #8a7a68; font-style: italic; margin-top:4px;
+  }
+
+  /* REASONS SECTION */
+  .reasons{
+    margin-top: 8px;
+    display:flex; flex-wrap:wrap; gap: 10px; justify-content:center;
+  }
+  .spark{
+    width: 40px; height:40px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, var(--gold-soft), var(--gold) 75%);
+    border:none; cursor:pointer; box-shadow: 0 3px 8px rgba(0,0,0,.25);
+    position:relative; transition: transform .25s ease;
+    font-family:'Caveat', cursive; color:#4a3418; font-size:18px;
+  }
+  .spark:hover{ transform: scale(1.12) rotate(-4deg); }
+  .spark.used{ background: radial-gradient(circle at 35% 30%, #d8cbb0, #b9a988 75%); }
+
+  .reveal-box{
+    margin-top: 14px; min-height: 26px; text-align:center;
+    font-family:'Caveat', cursive; font-size: 24px; color:#7a3b46;
+    transition: opacity .3s ease;
+  }
+
+  .prompt-row{
+    text-align:center; margin-top: 26px; font-family:'Cormorant Garamond', serif;
+    font-size: 15px; color:#8a7a68; letter-spacing:.4px;
+  }
+
+  .dedication{
+    display:none;
+    margin-top: 30px;
+    padding-top: 26px;
+    border-top: 1px solid rgba(60,46,42,.15);
+    text-align:center;
+    animation: rise 1s ease both;
+  }
+  .dedication-line{
+    font-family:'Caveat', cursive; font-size: 22px; color:#8a7a68;
+    margin-bottom: 18px;
+  }
+  .dedication-photo{
+    width: min(280px, 70%);
+    border-radius: 4px;
+    box-shadow: 0 14px 34px rgba(0,0,0,.35), 0 0 0 8px #fff, 0 0 0 9px rgba(0,0,0,.06);
+    transform: rotate(-2deg);
+    margin: 4px 0 20px;
+  }
+  .dedication-text{
+    font-family:'Caveat', cursive; font-size: 34px; color:#7a3b46;
+    margin-bottom: 18px;
+  }
+  .play-btn{ display:none; }
+
+  @media (max-width: 480px){
+    #letter-full{ padding: 34px 22px 28px; }
+    .body-text p{ font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="stage">
+  <div>
+    <div id="envelope-wrap">
+      <div class="envelope">
+        <div class="env-body"></div>
+        <div class="letter-peek"></div>
+        <div class="env-shadow-fold"></div>
+        <div class="env-flap"></div>
+        <div class="seal">A</div>
+      </div>
+    </div>
+    <div class="hint">toca el sobre para abrirlo ✦</div>
+
+    <div id="letter-full">
+      <div class="to-line">Para Angy,</div>
+      <div class="body-text">
+        <p><span class="drop">N</span>o necesito que sea un día especial para escribirte esto. Pero yo siempre quiero recordarte y decirte que te quiero, aunque sea un día normal o un día más, para mí, es un día mas amandote y estando a tu lado.</p>
+        <p>Y tú eres todo lo que quiero en mis días, en cada momento: la persona con la que quiero contar lo que me pasó en el día, incluso lo aburrido, incluso los pendientes, incluso cuando ando a mil cosas y no tengo mucho que decir pero igual quiero decírtelo a ti.</p>
+        <p>No tengo un motivo grande. No es aniversario, no es tu cumpleaños, no pasó nada extraordinario. Es solo que hoy te extraño y quiero recordarte que te quiero, que no hay dia y momento que no agradezca el quererte y el tenerte en mi vida, y como siempre no te vas nunca de mi pensamiento.</p>
+        <p>Por que mi amor por ti no tiene límites y es tan grande y especial que sólo existe para ti.</p>
+      </div>
+
+      <div class="signature">
+        Fer
+        <small>Para Mi Princesita Pequeña que tanto Adoro y Quiero.</small>
+      </div>
+
+      <div class="prompt-row">toca las chispitas ✦</div>
+      <div class="reasons" id="sparks"></div>
+      <div class="reveal-box" id="revealBox"></div>
+
+      <div class="dedication" id="dedication">
+        <div class="dedication-line">y por todo lo demás que no cabe en seis chispas...</div>
+        <img class="dedication-photo" src="amormio.jpg" alt="nosotros">
+        <div class="dedication-text">te amo, Angy Mi Niña Hermosa.</div>
+        <audio id="song" src="mydear.mp3" preload="none"></audio>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // stars background
+  const starsC = document.getElementById('stars');
+  for(let i=0;i<70;i++){
+    const s = document.createElement('span');
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDelay = (Math.random()*4)+'s';
+    starsC.appendChild(s);
+  }
+
+  // envelope open
+  const wrap = document.getElementById('envelope-wrap');
+  const letter = document.getElementById('letter-full');
+  wrap.addEventListener('click', () => {
+    if(wrap.classList.contains('open')) return;
+    wrap.classList.add('open');
+    setTimeout(() => {
+      wrap.style.display = 'none';
+      document.querySelector('.hint').style.display = 'none';
+      letter.style.display = 'block';
+    }, 950);
+  });
+
+  // reasons / sparks
+  const reasons = [
+    "por cómo te ríes de tus propios chistes antes de terminarlos",
+    "porque me haces querer ser mejor sin decírmelo directamente",
+    "por aguantarme y quererme tanto",
+    "porque contigo hasta lo aburrido se siente bien",
+    "por ser Tu conmigo y ser y por expresarme todo tu amor",
+    "porque cada momento que recuerdo contigo son un tesoro que alegra mis días"
+  ];
+  const sparksC = document.getElementById('sparks');
+  const revealBox = document.getElementById('revealBox');
+  const dedication = document.getElementById('dedication');
+  const song = document.getElementById('song');
+  let clickedCount = 0;
+  const clicked = new Set();
+
+  reasons.forEach((txt, i) => {
+    const b = document.createElement('button');
+    b.className = 'spark';
+    b.textContent = '✦';
+    b.addEventListener('click', () => {
+      revealBox.style.opacity = 0;
+      setTimeout(() => {
+        revealBox.textContent = txt;
+        revealBox.style.opacity = 1;
+      }, 150);
+      b.classList.add('used');
+
+      if(!clicked.has(i)){
+        clicked.add(i);
+        if(clicked.size === reasons.length){
+          setTimeout(() => {
+            dedication.style.display = 'block';
+            dedication.scrollIntoView({ behavior:'smooth', block:'center' });
+            song.play().catch(() => { /* el navegador bloqueó el autoplay */ });
+          }, 500);
+        }
+      }
+    });
+    sparksC.appendChild(b);
+  });
+</script>
+
+</body>
+</html>
